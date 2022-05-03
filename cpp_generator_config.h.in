@@ -1,0 +1,3 @@
+// the configured options and settings for CppGenerator
+#define CppGenerator_VERSION_MAJOR @CppGenerator_VERSION_MAJOR@
+#define CppGenerator_VERSION_MINOR @CppGenerator_VERSION_MINOR@
