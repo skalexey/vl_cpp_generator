@@ -1,6 +1,7 @@
 #include <set>
 #include <iostream>
 #include <cstring>
+#include <cassert>
 #include <vl.h>
 #include <TypeResolver.h>
 #include "cpp_writer.h"
@@ -76,7 +77,7 @@ namespace vl
 				assert(name); // Any property if an object should have it's name
 				auto name_str = (name ? name : "");
 				var_desc_ptr new_val(nullptr);
-				if (new_val = current_val_obj->find_field(name_str))
+				if ((new_val = current_val_obj->find_field(name_str)))
 					new_val = val;
 				else
 					new_val = current_val_obj->add_field(name_str, val);
@@ -208,13 +209,13 @@ namespace vl
 		//m_level--;
 		//PRINT_CPP("};");
 		auto container = get_current_container();
-		assert(container, "A current container should always exists when ending visiting an object");
+		assert(container && "A current container should always exist when ending visiting an object");
 		if (!container)
 		{
 			LOCAL_ERROR("Empty container stack when ending visiting object '" << name << "'");
 			return false;
 		}
-		assert(container->is_class(), "Ending visiting an object should work with a class container");
+		assert(container->is_class() && "Ending visiting an object should work with a class container");
 		pop_current_container();
 		print_context ctx = { *this };
 		if (m_stack.empty()) // is root
