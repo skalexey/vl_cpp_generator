@@ -1,18 +1,23 @@
 cmake_minimum_required(VERSION 3.21)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Uncomment the next line if want to experiment with g++ compliation
 #set(CMAKE_CXX_COMPILER "g++")
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
 
 project(cpp_generator)
 option(TESTS "Add Test target" OFF)
 option(CLIENT "Add vl_jsontocpp executable target" ON)
 
-set(VL_DIR "${PROJECT_SOURCE_DIR}/../VL")
-set(DMBCORE_DIR "${PROJECT_SOURCE_DIR}/../DataModelBuilder/Core")
+if ("${DEPS}" STREQUAL "")
+	message("WARNING: DEPS is not specified. Take the default value")
+	set(DEPS "${PROJECT_SOURCE_DIR}/..")
+else()
+	message("DEPS: ${DEPS}")
+endif()
+
+set(DMBCORE_DIR "${DEPS}/DataModelBuilder/Core")
 
 #message("cpp_generator CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
@@ -40,7 +45,6 @@ file(GLOB SRC "src/*")
 file(GLOB HEADERS "include/*")
 add_library(cpp_generator ${SRC} ${HEADERS})
 
-target_link_libraries (cpp_generator VL)
 target_link_libraries (cpp_generator DMBCore)
 
 configure_file(
