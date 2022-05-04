@@ -1,6 +1,7 @@
 #!/bin/sh
 
-echo " -- Build for OS: $OSTYPE"
+folderName=${PWD##*/}
+echo " -- Build folder '${folderName}' for OS: $OSTYPE"
 
 buildFolderPrefix="Build"
 generatorArg=" "
@@ -8,14 +9,19 @@ onlyLibArg=" "
 cmakeTestsArg=" "
 cmakeGppArg=" "
 extraArg=" "
-extraArgWin=" -DINCLUDES=~/Projects/Utils"
-extraArgMac=""
+extraArgWin=$extraArg
+extraArgMac=$extraArg
 buildConfig="Debug"
 logArg=" -DLOG_ON=ON"
-build="Build-cmake"
+build=""
 rootDirectory="."
-folderName=${PWD##*/}
 onlyConfig=false
+
+if [ -f "deps_config.sh" ]; then
+	source deps_config.sh
+fi
+
+source build_config.sh
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
 	generatorArg=" "
@@ -73,6 +79,18 @@ done
 
 enterDirectory=${pwd}
 
+if [ -f "get_dependencies.sh" ]; then
+	./get_dependencies.sh
+	retval=$?
+	if [ $retval -ne 0 ]; then
+		echo " ---- Dependencies resolution error"
+		exit 1
+	else
+		echo " ---- Done with dependencies"
+		cd "$enterDirectory"
+	fi
+fi
+
 [ ! -d "$rootDirectory" ] && echo "Non-existent project directory passed '$rootDirectory'" && exit 1 || cd "$rootDirectory"
 
 if [[ "$rootDirectory" != "." ]]; then
@@ -83,7 +101,7 @@ echo "Build folder '$folderName'"
 
 build="${buildFolderPrefix}-cmake"
 
-echo "--- Output directory: '$build' --- "
+echo " --- Output directory: '$build' --- "
 
 [ ! -d "$build" ] && mkdir $build || echo "	already exists"
 cd $build
@@ -99,7 +117,7 @@ else
 	echo " --- CMake configuring of folder '$folderName' successfully done ---"
 fi
 
-[ "$onlyConfig" == true ] && exit && echo " --- Exit after configuring with CMake" || echo " --- Build folder '$folderName' with CMake"
+[ "$onlyConfig" == true ] && echo "--- Exit without build" && exit || echo "--- Run cmake --build"
 
 cmake --build . --config=$buildConfig
 
