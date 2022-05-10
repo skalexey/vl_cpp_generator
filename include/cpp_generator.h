@@ -1,15 +1,13 @@
 #pragma once
 
 #include <string>
+#include "cppgen_fwd.h"
 
 namespace vl
 {
 	class cpp_generator
 	{
 	public:
-		void generate(
-			const std::string& input_file_path
-			, const std::string& out_dir_path
-		);
+		int generate(const cppgenerator_params& __params);
 	};
 }
