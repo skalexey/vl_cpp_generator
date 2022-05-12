@@ -1,0 +1,7 @@
+Implemented support of all basic features: 
+	* fields getters, setters,
+	* constructors,
+	* bool operator, 
+	* forward declarations,
+	* inheritance for prototyping support,
+	* input configuration parameters through the command line (now supported options -print_root, -branch, -setters)
