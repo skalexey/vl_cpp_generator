@@ -1,21 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
+source log.sh
 folderName=${PWD##*/}
-echo " -- Build folder '${folderName}' for OS: $OSTYPE"
+log_prefix="-- [${folderName} build script]: "
 
-buildFolderPrefix="Build"
-generatorArg=" "
-onlyLibArg=" "
-cmakeTestsArg=" "
-cmakeGppArg=" "
+log "Build for OS: $OSTYPE" " -" " ---"
+
 extraArg=" "
 extraArgWin=$extraArg
 extraArgMac=$extraArg
-buildConfig="Debug"
-logArg=" -DLOG_ON=ON"
-build=""
-rootDirectory="."
-onlyConfig=false
 
 if [ -f "deps_config.sh" ]; then
 	source deps_config.sh
@@ -44,64 +37,37 @@ else
 	generatorArg=" "
 fi
 
-[ ! -z "$extraArg" ] && echo " --- Extra arguments: '$extraArg'"
+[ ! -z "$extraArg" ] && log "Extra arguments: '$extraArg'" " -"
 
-argIndex=0
-for arg in "$@" 
-do
-	#echo "arg[$argIndex]: '$arg'"
-	
-	if [[ $argIndex -eq 0 ]]; then
-		rootDirectory=$arg
-	else
-		if [[ "$arg" == "only-lib" ]]; then
-			echo "--- 'only-lib' option passed. Build only library without tests"
-			onlyLibArg=" only-lib"
-			cmakeTestsArg=" "
-		elif [[ "$arg" == "g++" ]]; then
-			echo "--- 'g++' option passed. Build with g++ compiler"
-			cmakeGppArg= -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gpp
-			gppArg="g++"
-			buildFolderPrefix="Build-g++"
-		elif [[ "$arg" == "no-log" ]]; then
-			echo "--- 'no-log' option passed. Turn off LOG_ON compile definition"
-			logArg=" "
-		elif [[ "$arg" == "release" ]]; then
-			echo "--- 'release' option passed. Set Release build type"
-			buildConfig="Release"
-		elif [[ "$arg" == "configure" ]]; then
-			echo "--- 'configure' option passed. Will not build the project. Only make the config"
-			onlyConfig=true
-		fi
-	fi	
-	argIndex=$((argIndex + 1))
-done
+source build_utils.sh
+
+parse_args $@
 
 enterDirectory=${pwd}
 
 if [ -f "get_dependencies.sh" ]; then
-	./get_dependencies.sh
+	source get_dependencies.sh $@
 	retval=$?
 	if [ $retval -ne 0 ]; then
-		echo " ---- Dependencies resolution error"
+		log "Dependencies resolution error" " --"
 		exit 1
 	else
-		echo " ---- Done with dependencies"
+		log "Done with dependencies" " --"
 		cd "$enterDirectory"
 	fi
 fi
 
-[ ! -d "$rootDirectory" ] && echo "Non-existent project directory passed '$rootDirectory'" && exit 1 || cd "$rootDirectory"
+[ ! -d "$rootDirectory" ] && log "Non-existent project directory passed '$rootDirectory'" " -" && exit 1 || cd "$rootDirectory"
 
 if [[ "$rootDirectory" != "." ]]; then
 	folderName=$rootDirectory
 fi
 
-echo "Build folder '$folderName'"
+echo "--- [${folderName}]: Configure with CMake"
 
 build="${buildFolderPrefix}-cmake"
 
-echo " --- Output directory: '$build' --- "
+log "Output directory: '$build'" " -"
 
 [ ! -d "$build" ] && mkdir $build || echo "	already exists"
 cd $build
@@ -110,26 +76,26 @@ cmake ..$generatorArg$logArg$extraArg
 
 retval=$?
 if [ $retval -ne 0 ]; then
-	echo " --- CMake configure error of folder '$folderName' --- "
+	log "CMake configure error" " -"
 	cd "$enterDirectory"
 	exit
 else
-	echo " --- CMake configuring of folder '$folderName' successfully done ---"
+	log "CMake configuring has been successfully done" " -"
 fi
 
-[ "$onlyConfig" == true ] && echo "--- Exit without build" && exit || echo "--- Run cmake --build"
+[ "$onlyConfig" == true ] && log "Exit without build" " -" && exit || log "Run cmake --build" " -"
 
 cmake --build . --config=$buildConfig
 
 retval=$?
 if [ $retval -ne 0 ]; then
-	echo " --- CMake build error of folder '$folderName' --- "
+	log "CMake build error" " -"
 	cd "$enterDirectory"
 	exit
 else
-	echo " --- CMake building of folder '$folderName' successfully done ---"
+	log "CMake building is successfully done" "-" " ---"
 fi
 
 cd "$enterDirectory"
 
-echo " --- Finished build of '$folderName' ---"
+log "Finished build" " -" " ---"
