@@ -18,10 +18,11 @@ namespace vl
 		auto& out_dir_path = __params.out_dir_path;
 		auto& input_file_path = __params.input_file_path;
 		auto& json_branch = __params.json_branch;
-		
 		if (m.Load(input_file_path))
 		{
 			cppw_params params;
+			if (!__params.print_root)
+				params.root_name = "";
 			params.cppgen_params = __params;
 			const vl::Object* data_ptr = nullptr;
 			if (!json_branch.empty())
@@ -45,8 +46,6 @@ namespace vl
 			}
 			else
 			{
-				if (!__params.print_root)
-					params.root_name = "";
 				cpp_writer wr(m.GetTypeResolver(), params);
 				m.GetData().Accept(wr);
 			}

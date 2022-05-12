@@ -128,7 +128,7 @@ namespace
 
 namespace
 {
-	#define CLASS_CPP_SCOPE (ctx.parent_class.empty() ? "" : ctx.parent_class + "::") + get_name() + "::"
+	#define CLASS_CPP_SCOPE (ctx.cpp_scope())
 	#define CLASS_DEF_CONSTRUCTOR_SIGNATURE get_name() << "()"
 	#define CLASS_DEF_CONSTRUCTOR_DECL CLASS_DEF_CONSTRUCTOR_SIGNATURE << " = default;"
 	#define CLASS_CONSTRUCTOR_SIGNATURE get_name() << "(const vl::VarPtr& data)"
@@ -286,6 +286,8 @@ namespace vl
 			}
 			return true;
 		}
+
+		return false;
 	}
 
 	var_desc_ptr cpp_writer::get_current_container()
@@ -392,7 +394,7 @@ namespace vl
 		assert(abstract_container->is_class() && "Ending visiting an object should work with a class container");
 		auto container = abstract_container->as_class();
 		pop_current_container();
-		class_desc::class_print_context ctx = { *this };
+		class_desc::class_print_context ctx = { *this, *container };
 		if (m_stack.empty()) // is root
 		{
 			container->print(ctx);
@@ -591,13 +593,11 @@ namespace vl
 			{
 				PRINT_LINE("// Nested object fields classes")
 				PRINT_INDENT_DECREASE;
-				class_print_context subctx = ctx;
+				class_print_context subctx = { ctx.writer, *this , ctx.file, ctx.indent_level };
 				subctx.file = &f;
 				subctx.indent_level = INDENT_LEVEL + 1;
-				subctx.parent_class = get_name();
+				subctx.parent_context = &ctx;
 				std::for_each(subclasses.begin(), subclasses.end(), [&](auto f) {
-					if (f.first == "options")
-						std::cout << "catched";
 					f.second->as_class()->print(subctx);
 				});
 				PRINT_INDENT_INCREASE;
@@ -694,13 +694,13 @@ namespace vl
 			PRINT_LINE_BREAK;
 			PRINT_LINE("namespace " << ctx.writer.get_params().cpp_namespace);
 			PRINT_SCOPE_BEGIN;
-			auto defs_ctx = ctx;
-			defs_ctx.file = &fcpp;
+			class_print_context defs_ctx = { ctx.writer, *this, &fcpp, ctx.indent_level };
 			defs_ctx.indent_level = INDENT_LEVEL;
 			print_definitions_context print_defs_ctx = {defs_ctx, &pdata};
 			print_definitions(print_defs_ctx);
 			PRINT_SCOPE_END;
 		}
+		return 0;
 	}
 
 	void class_desc::print_definitions(print_definitions_context& pctx) const
@@ -867,13 +867,11 @@ namespace vl
 		if (!subclasses.empty())
 		{
 			PRINT_LINE("// Subclasses definitions begin")
-			class_print_context subctx = ctx;
-			subctx.indent_level = INDENT_LEVEL;
-			subctx.parent_class = get_name();
-			print_definitions_context print_defs_subctx = {subctx};
 			std::for_each(subclasses.begin(), subclasses.end(), [&](auto f) {
 				auto& n = f.first;
 				auto& c = f.second;
+				class_print_context subctx = { ctx.writer, *c->as_class() , ctx.file, INDENT_LEVEL, &ctx};
+				print_definitions_context print_defs_subctx = { subctx };
 				c->as_class()->print_definitions(print_defs_subctx);
 			});
 		}

@@ -101,9 +101,22 @@ namespace vl
 		struct class_print_context
 		{
 			cpp_writer& writer;
+			const class_desc& class_ref;
 			std::ofstream* file = nullptr;
 			int indent_level = 0;
-			std::string parent_class;
+			class_print_context* parent_context = nullptr;
+
+			inline std::string cpp_scope(const std::string& suffix = "") const {
+				std::string result;
+				auto ctx = this;
+				while (ctx) {
+					result = (ctx->class_ref.get_name() + "::") + result;
+					ctx = ctx->parent_context;
+				}
+				if (!suffix.empty())
+					result += (suffix + "::");
+				return result;
+			}
 		};
 	public:
 		class_desc() = default;
