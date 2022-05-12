@@ -13,12 +13,11 @@ option(CLIENT "Add vl_jsontocpp executable target" ON)
 if ("${DEPS}" STREQUAL "")
 	message("WARNING: DEPS is not specified. Take the default value")
 	set(DEPS "${PROJECT_SOURCE_DIR}/..")
-else()
-	message("DEPS: ${DEPS}")
 endif()
+message("vl_cpp_generator: DEPS: ${DEPS}")
 
 set(DMBCORE_DIR "${DEPS}/DataModelBuilder/Core")
-
+message("vl_cpp_generator DMBCORE_DIR: '${DMBCORE_DIR}'")
 #message("cpp_generator CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 if (CMAKE_CXX_COMPILER EQUAL "g++")
@@ -62,3 +61,9 @@ if (CLIENT)
 	add_executable(vl_jsontocpp vl_jsontocpp.cpp)
 	target_link_libraries(vl_jsontocpp cpp_generator)
 endif()
+
+add_custom_command(
+    TARGET vl_jsontocpp PRE_BUILD
+    COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/get_dependencies.sh ${CMAKE_BUILD_TYPE} "${CMAKE_CURRENT_SOURCE_DIR}"
+    VERBATIM
+)
