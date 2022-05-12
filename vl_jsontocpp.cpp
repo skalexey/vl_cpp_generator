@@ -6,6 +6,7 @@
 
 int main(int argc, char* argv[])
 {
+	std::cout << std::boolalpha;
 	if (argc < 2)
 	{
 		std::cout << "Too few arguments\n";
@@ -19,19 +20,20 @@ int main(int argc, char* argv[])
 	
 	for (int i = 0; i < argc; i++)
 	{
+		auto arg = argv[i];
 		if (i == 1)
-			params.input_file_path = argv[i];
+			params.input_file_path = arg;
 		else if (i == 2)
-			params.out_dir_path = argv[i];
+			params.out_dir_path = arg;
 		else
 		{
-			if (auto opt_val = utils::get_option_value(argv[i], "-print_root"))
+			if (auto opt_val = utils::get_option_value(arg, "-print_root"))
 				params.print_root = Utils::ParseBool(opt_val.val);
-			if (auto opt_val = utils::get_option_value(argv[i], "-branch"))
+			else if (auto opt_val = utils::get_option_value(arg, "-branch"))
 				params.json_branch = opt_val.val;
-			if (auto opt_val = utils::get_option_value(argv[i], "-ignore_overloadings"))
+			else if (auto opt_val = utils::get_option_value(arg, "-ignore_overloadings"))
 				params.ignore_overloadings = Utils::ParseBool(opt_val.val);
-			if (auto opt_val = utils::get_option_value(argv[i], "-setters"))
+			else if (auto opt_val = utils::get_option_value(arg, "-setters"))
 				params.generate_setters = Utils::ParseBool(opt_val.val);
 		}
 	}
