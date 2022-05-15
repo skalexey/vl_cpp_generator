@@ -1,32 +1,37 @@
 #!/bin/bash
 
-enterDirectory=${PWD}
+get_dependencies()
+{
+	local enterDirectory=${PWD}
 
-if [ ! -z "$1" ]; then 
-	echo "Go to the source directory passed: '$1'"
-	cd "$1" # go to the source directory passed
-fi
+	if [ ! -z "$1" ]; then 
+		echo "Go to the source directory passed: '$1'"
+		cd "$1" # go to the source directory passed
+	fi
 
-folderName=${PWD##*/}
+	local folderName=${PWD##*/}
 
-source log.sh
+	source log.sh
 
-log_prefix="-- [${folderName} get_dependencies script]: "
+	local log_prefix="-- [${folderName} get_dependencies script]: "
 
-log "Check for dependencies" " -"
+	log "Check for dependencies" " -"
 
-if [ ! -f "deps_config.sh" ]; then
-	log "No dependencies" " -"
-	exit
-fi
-source deps_config.sh
+	if [ ! -f "deps_config.sh" ]; then
+		log "No dependencies" " -"
+		exit
+	fi
+	source deps_config.sh
 
-source deps_scenario.sh $@
-retval=$?
-if [ $retval -ne 0 ]; then
-	log "Error occured during the deps_scenario.sh execution " " -"
+	source deps_scenario.sh $@
+	local retval=$?
+	if [ $retval -ne 0 ]; then
+		log "Error occured during the deps_scenario.sh execution " " -"
+		cd "${enterDirectory}"
+		exit 1
+	fi
+
 	cd "${enterDirectory}"
-	exit 1
-fi
+}
 
-cd "${enterDirectory}"
+get_dependencies $@
