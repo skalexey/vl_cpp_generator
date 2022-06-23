@@ -19,7 +19,7 @@ download_dependency()
 		mkdir -p "${deps_path}"
 		local retval=$?
 		if [ $retval -ne 0 ]; then
-			log "Directory '${deps_path}' creation error" " ---"
+			log_error "Directory '${deps_path}' creation error" " ---"
 			exit 1
 		else
 			log "Created" " ---"
@@ -34,10 +34,10 @@ download_dependency()
 		cd "${cur_path}"
 		local retval=$?
 		if [ $retval -ne 0 ]; then
-			log "Directory '${dep_name}' creation error" " ---"
+			log_error "Directory '${dep_name}' creation error" " ---"
 			exit 1
 		else
-			log "Completed download of dependency '$dep_dir_name'" " ---"
+			log_success "Completed download of dependency '$dep_dir_name'" " ---"
 		fi
 	else
 		log "Dependency '$dep_dir_name' is already downloaded" " ---"

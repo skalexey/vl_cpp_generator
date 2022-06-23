@@ -26,7 +26,7 @@ get_dependencies()
 	source deps_scenario.sh $@
 	local retval=$?
 	if [ $retval -ne 0 ]; then
-		log "Error occured during the deps_scenario.sh execution " " -"
+		log_error "Error occured during the deps_scenario.sh execution " " -"
 		cd "${enterDirectory}"
 		exit 1
 	fi
