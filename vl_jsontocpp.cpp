@@ -1,7 +1,7 @@
 #include <utility>
 #include <iostream>
 #include "cpp_generator.h"
-#include <utils/Utils.h>
+#include <utils/string_utils.h>
 #include <utils/command_line.h>
 
 int main(int argc, char* argv[])
@@ -28,13 +28,13 @@ int main(int argc, char* argv[])
 		else
 		{
 			if (auto opt_val = utils::get_option_value(arg, "-print_root"))
-				params.print_root = Utils::ParseBool(opt_val.val);
+				params.print_root = utils::parse_bool(opt_val.val);
 			else if (auto opt_val = utils::get_option_value(arg, "-branch"))
 				params.json_branch = opt_val.val;
 			else if (auto opt_val = utils::get_option_value(arg, "-ignore_overloadings"))
-				params.ignore_overloadings = Utils::ParseBool(opt_val.val);
+				params.ignore_overloadings = utils::parse_bool(opt_val.val);
 			else if (auto opt_val = utils::get_option_value(arg, "-setters"))
-				params.generate_setters = Utils::ParseBool(opt_val.val);
+				params.generate_setters = utils::parse_bool(opt_val.val);
 		}
 	}
 	return gen.generate(params);

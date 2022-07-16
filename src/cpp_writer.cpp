@@ -7,7 +7,6 @@
 #include "cpp_writer.h"
 #ifdef LOG_ON
 	LOG_TITLE("cpp_writer")
-	LOG_STREAM([]() -> std::ostream& { return std::cout; })
 	SET_LOG_DEBUG(true)
 #endif
 
