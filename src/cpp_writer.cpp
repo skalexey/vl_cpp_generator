@@ -809,7 +809,7 @@ namespace vl
 						// Define non-const list getter
 						PRINT_LINE(METHOD_DEFINITION("vl::List&", fn, "", ""));
 						PRINT_SCOPE_BEGIN;
-						PRINT_LINE("return const_cast<vl::List&>(get_list());");
+						PRINT_LINE("return const_cast<vl::List&>(get_" << fn << "()); ");
 						PRINT_SCOPE_END;
 						PRINT_LINE_BREAK;
 						
