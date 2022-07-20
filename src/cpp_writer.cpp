@@ -93,8 +93,10 @@ namespace
 	#define PRINT_DATA_GET(fn) \
 		PRINT_LINE("auto& " << DATA_VAR_NAME(fn) << " = data_obj.Get(\"" << fn << "\");");
 	
-	#define PRINT_RETURN_DATA_GET_UNQUOTED(fn, suffix) \
-		PRINT_LINE("return data_obj.Get(" << fn << ")" << suffix << ";");
+
+	#define PRINT_RETURN_DATA_METHOD_UNQUOTED(fn, m, suffix) \
+		PRINT_LINE("return data_obj." << m << "(" << fn << ")" << suffix << ";");
+
 	// Typed data
 	#define PRINT_DATA_IS_TYPE_CHECK(t, fn, return_ex); \
 		PRINT_LINE("if (!" << DATA_VAR_NAME(fn) << ".Is" << t << "())"); \
@@ -120,9 +122,9 @@ namespace
 		PRINT_DATA_IS_TYPE_CHECK(t, fn, " empty_val"); \
 		PRINT_DATA_RETURN_AS_TYPE(t, fn, suffix);
 
-	#define PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED(fn, return_ex) \
+	#define PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED(fn, m, return_ex) \
 		PRINT_DATA_OBJECT_WITH_CHECKS(return_ex); \
-		PRINT_RETURN_DATA_GET_UNQUOTED(fn, "");
+		PRINT_RETURN_DATA_METHOD_UNQUOTED(fn, m, "");
 }
 
 namespace
@@ -577,6 +579,10 @@ namespace vl
 		{
 			// Declare get_data(string) method
 			PRINT_LINE("const vl::Var& get_data(const std::string& field_name) const;");
+			// Declare has_data(string) method
+			PRINT_LINE("bool has_data(const std::string& field_name) const;");
+			// Declare has_data_own(string) method
+			PRINT_LINE("bool has_data_own(const std::string& field_name) const;");
 			// Declare get_data() method
 			PRINT_LINE("// Data getter for internal use");
 			PRINT_LINE("inline const vl::VarPtr& get_data() const {");
@@ -777,7 +783,27 @@ namespace vl
 		{
 			PRINT_LINE("const vl::Var& " << CLASS_CPP_SCOPE << "get_data(const std::string& field_name) const");
 			PRINT_SCOPE_BEGIN;
-			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", " vl::emptyVar");
+			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", "Get", " vl::emptyVar");
+			PRINT_SCOPE_END;
+			PRINT_LINE_BREAK;
+		}
+
+		// Define has_data(string) method
+		if (pdata.proto_id.empty())
+		{
+			PRINT_LINE("bool " << CLASS_CPP_SCOPE << "has_data(const std::string& field_name) const");
+			PRINT_SCOPE_BEGIN;
+			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", "Has", " vl::emptyVar");
+			PRINT_SCOPE_END;
+			PRINT_LINE_BREAK;
+		}
+
+		// Define has_data_own(string) method
+		if (pdata.proto_id.empty())
+		{
+			PRINT_LINE("bool " << CLASS_CPP_SCOPE << "has_data_own(const std::string& field_name) const");
+			PRINT_SCOPE_BEGIN;
+			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", "HasOwn", " vl::emptyVar");
 			PRINT_SCOPE_END;
 			PRINT_LINE_BREAK;
 		}
