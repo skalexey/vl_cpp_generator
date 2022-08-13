@@ -585,7 +585,7 @@ namespace vl
 			PRINT_LINE("bool has_data_own(const std::string& field_name) const;");
 			// Declare get_data() method
 			PRINT_LINE("// Data getter for internal use");
-			PRINT_LINE("inline const vl::VarPtr& get_data() const {");
+			PRINT_LINE("const vl::VarPtr& get_data() const {");
 			PRINT_INDENT_INCREASE;
 			PRINT_LINE("return m_data;");
 			PRINT_SCOPE_END;
@@ -653,7 +653,7 @@ namespace vl
 			PRINT_LINE("protected:");
 			PRINT_INDENT_INCREASE;
 			PRINT_LINE("// Data getter for internal use");
-			PRINT_LINE("inline const vl::VarPtr& _data_() const {");
+			PRINT_LINE("const vl::VarPtr& _data_() const {");
 			PRINT_INDENT_INCREASE;
 			PRINT_LINE("return m_data;");
 			PRINT_SCOPE_END;

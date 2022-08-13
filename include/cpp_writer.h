@@ -34,21 +34,21 @@ namespace vl
 			: m_data(data)
 		{}
 		vl::VarPtr& get_data() { return m_data; }
-		inline virtual bool is_class() const { return false; }
-		inline virtual bool is_list() const { return false; }
-		inline virtual bool is_primitive() const { return false; }
-		inline virtual class_desc_ptr as_class() { return nullptr; }
-		inline virtual list_desc_ptr as_list() { return nullptr; }
-		inline virtual list_desc_ptr_const as_list() const { return nullptr; }
-		inline virtual primitive_type_desc* as_primitive_type() { return nullptr; }
-		inline virtual class_desc_ptr_const as_class() const { return nullptr; }
-		inline virtual const primitive_type_desc* as_primitive_type() const { return nullptr; }
-		inline const var_desc_ptr& parent() const { return m_parent; }
+		virtual bool is_class() const { return false; }
+		virtual bool is_list() const { return false; }
+		virtual bool is_primitive() const { return false; }
+		virtual class_desc_ptr as_class() { return nullptr; }
+		virtual list_desc_ptr as_list() { return nullptr; }
+		virtual list_desc_ptr_const as_list() const { return nullptr; }
+		virtual primitive_type_desc* as_primitive_type() { return nullptr; }
+		virtual class_desc_ptr_const as_class() const { return nullptr; }
+		virtual const primitive_type_desc* as_primitive_type() const { return nullptr; }
+		const var_desc_ptr& parent() const { return m_parent; }
 
 	protected:
 		vl::VarPtr& data() { return m_data; }
 		const vl::VarPtr& get_data() const { return m_data; }
-		inline void set_parent(const var_desc_ptr& parent) { m_parent = parent; }
+		void set_parent(const var_desc_ptr& parent) { m_parent = parent; }
 
 	private:
 		vl::VarPtr m_data;
@@ -65,12 +65,12 @@ namespace vl
 		primitive_type_desc(const vl::VarPtr& data)
 			: base(data)
 		{}
-		inline bool is_primitive() const override { return true; }
+		bool is_primitive() const override { return true; }
 		primitive_type_desc* as_primitive_type() override { return this; }
 		const primitive_type_desc* as_primitive_type() const override { return this; }
-		inline bool is_bool() const { return get_data() && get_data()->IsBool(); };
-		inline bool is_number() const { return get_data() && get_data()->IsNumber(); };
-		inline bool is_string() const { return get_data() && get_data()->IsString(); };
+		bool is_bool() const { return get_data() && get_data()->IsBool(); };
+		bool is_number() const { return get_data() && get_data()->IsNumber(); };
+		bool is_string() const { return get_data() && get_data()->IsString(); };
 	};
 	using primitive_type_ptr = std::shared_ptr<primitive_type_desc>;
 
@@ -106,7 +106,7 @@ namespace vl
 			int indent_level = 0;
 			class_print_context* parent_context = nullptr;
 
-			inline std::string cpp_scope(const std::string& suffix = "") const {
+			std::string cpp_scope(const std::string& suffix = "") const {
 				std::string result;
 				auto ctx = this;
 				while (ctx) {
@@ -130,15 +130,15 @@ namespace vl
 			, m_is_type(is_type)
 		{}
 		bool is_empty();
-		inline bool is_class() const override { return true; }
+		bool is_class() const override { return true; }
 		class_desc_ptr as_class() override { return shared(); }
 		class_desc_ptr_const as_class() const override { return shared(); }
 		const var_desc_ptr& add_field(const std::string& name, const var_desc_ptr& field);
 		const var_desc_ptr* find_field(const std::string& field) const;
 		void set(const std::string& field_name, const var_desc_ptr& field);
-		inline bool is_type() const { return m_is_type; }
-		inline bool is_root() const { return parent() == nullptr; }
-		inline const std::string& get_name() const { return m_class_name; }
+		bool is_type() const { return m_is_type; }
+		bool is_root() const { return parent() == nullptr; }
+		const std::string& get_name() const { return m_class_name; }
 		int print(class_print_context& ctx) const;
 		int print_fwd(class_print_context& ctx) const;
 		struct print_definitions_context
@@ -148,14 +148,14 @@ namespace vl
 		};
 		void print_definitions(print_definitions_context& ctx) const;
 		int collect_data(print_data& data, class_print_context& ctx) const;
-		inline class_desc_ptr shared() {
+		class_desc_ptr shared() {
 			return std::dynamic_pointer_cast<class_desc>(shared_from_this());
 		}
-		inline class_desc_ptr_const shared() const {
+		class_desc_ptr_const shared() const {
 			return std::dynamic_pointer_cast<const class_desc>(shared_from_this());
 		}
 		
-		inline fields_map_view get_fields_map() const {
+		fields_map_view get_fields_map() const {
 			return fields_map_view(m_fields);
 		}
 		bool has_proto() const;
@@ -189,17 +189,17 @@ namespace vl
 			: base(data)
 		{}
 		bool is_empty();
-		inline bool is_list() const override { return true; }
+		bool is_list() const override { return true; }
 		list_desc_ptr as_list() override { return shared(); }
 		list_desc_ptr_const as_list() const override { return shared(); };
-		inline list_desc_ptr shared() {
+		list_desc_ptr shared() {
 			return std::dynamic_pointer_cast<list_desc>(shared_from_this());
 		}
-		inline list_desc_ptr_const shared() const {
+		list_desc_ptr_const shared() const {
 			return std::dynamic_pointer_cast<const list_desc>(shared_from_this());
 		}
 		const var_desc_ptr& add_field(const var_desc_ptr& field);
-		inline const fields_list& get_fields() const { return m_fields; }
+		const fields_list& get_fields() const { return m_fields; }
 
 	private:
 		fields_list m_fields;
@@ -244,7 +244,7 @@ namespace vl
 		var_desc_ptr get_current_container();
 		void push_current_container(const var_desc_ptr& val);
 		bool pop_current_container();
-		inline global_print_context& print_context() {
+		global_print_context& print_context() {
 			return m_print_context;
 		}
 	
