@@ -23,6 +23,7 @@ namespace vl
 			if (!__params.print_root)
 				params.root_name = "";
 			params.cppgen_params = __params;
+			params.ignore = __params.ignore;
 			const vl::Object* data_ptr = nullptr;
 			if (!json_branch.empty())
 			{

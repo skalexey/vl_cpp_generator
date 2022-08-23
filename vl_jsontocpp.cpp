@@ -31,6 +31,8 @@ int main(int argc, char* argv[])
 				params.print_root = utils::parse_bool(opt_val.val);
 			else if (auto opt_val = utils::get_option_value(arg, "-branch"))
 				params.json_branch = opt_val.val;
+			else if (auto opt_val = utils::get_option_value(arg, "-itnore"))
+				params.ignore = opt_val.val;
 			else if (auto opt_val = utils::get_option_value(arg, "-ignore_overloadings"))
 				params.ignore_overloadings = utils::parse_bool(opt_val.val);
 			else if (auto opt_val = utils::get_option_value(arg, "-setters"))
