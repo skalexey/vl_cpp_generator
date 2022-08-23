@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.21)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project(cpp_generator)
+project(cpp_generator C CXX)
 option(TESTS "Add Test target" OFF)
 option(CLIENT "Add vl_jsontocpp executable target" ON)
 
@@ -70,11 +70,6 @@ else()
 endif()
 set(DEPS ${DEPS} PARENT_SCOPE)
 
-# Utils library dependency
-set(UTILS_DIR "${DEPS}/Utils")
-add_subdirectory ("${UTILS_DIR}" "${UTILS_DIR}/${BUILD_DIR_NAME}")
-set(CUSTOM_INCLUDES ${CUSTOM_INCLUDES} ${utils_INCLUDES})
-
 # DMBCore dependency
 if ("${DMBCORE_DIR}" STREQUAL "")
 	set(DMBCORE_DIR "${DEPS}/DataModelBuilder/Core")
@@ -118,7 +113,6 @@ add_library(cpp_generator ${SRC} ${HEADERS})
 
 # link libraries
 target_link_libraries (cpp_generator DMBCore)
-target_link_libraries (cpp_generator utils)
 
 # Link all librariles including inherited
 set(cnt 1)
