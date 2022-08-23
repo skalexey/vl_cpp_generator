@@ -75,8 +75,6 @@ namespace vl
 	using primitive_type_ptr = std::shared_ptr<primitive_type_desc>;
 
 	// class_desc
-	
-	
 	class class_desc : public var_desc
 	{
 		friend class cpp_writer;

@@ -380,7 +380,7 @@ namespace vl
 				);
 				auto val = std::make_shared<class_desc>(vl::MakePtr(var), process_class_name(class_name), is_type);
 				if (!add_member(val, name))
-					return false;
+ 					return false;
 			}
 		}
 		else
