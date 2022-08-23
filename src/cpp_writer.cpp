@@ -53,8 +53,8 @@ namespace
 		PRINT_INDENT_DECREASE; \
 		PRINT_LINE("};");
 
-	#define CLASS_DATA_INITIALIZER (has_proto() ? (get_proto_id(ctx.writer.get_type_resolver()) + "(data)") : "m_data(data)")
-	#define CLASS_DATA_INITIALIZER_2 (has_proto() ? (get_proto_id(ctx.writer.get_type_resolver()) + "(vl::MakePtr(data))") : "m_data(vl::MakePtr(data))")
+	#define CLASS_DATA_INITIALIZER (has_proto() ? (get_proto_class_name(ctx.writer.get_type_resolver()) + "(data)") : "m_data(data)")
+	#define CLASS_DATA_INITIALIZER_2 (has_proto() ? (get_proto_class_name(ctx.writer.get_type_resolver()) + "(vl::MakePtr(data))") : "m_data(vl::MakePtr(data))")
 
 	#define M_DATA \
 		(pdata.proto_id.empty() ? "m_data" : "_data_()")
@@ -156,12 +156,23 @@ namespace
 namespace
 {
 	const std::set<std::string> restricted_names = { "alignas", "alignof", "and", "and_eq", "asm", "atomic_cancel", "atomic_commit", "atomic_noexcept", "auto", "bitand", "bitor", "bool", "break", "case", "catch", "char", "char8_t", "char16_t", "char32_t", "class", "compl", "concept", "const", "consteval", "constexpr", "constinit", "const_cast", "continue", "co_await", "co_return", "co_yield", "decltype", "default", "delete", "do", "double", "dynamic_cast", "else", "enum", "explicit", "export", "extern", "false", "float", "for", "friend", "goto", "if", "inline", "int", "long", "mutable", "namespace", "new", "noexcept", "not", "not_eq", "nullptr", "operator", "or", "or_eq", "private", "protected", "public", "reflexpr", "register", "reinterpret_cast", "requires", "return", "short", "signed", "sizeof", "static", "static_assert", "static_cast", "struct", "switch", "synchronized", "template", "this", "thread_local", "throw", "true", "try", "typedef", "typeid", "typename", "union", "unsigned", "using", "virtual", "void", "volatile", "wchar_t", "while", "xor", "xor_eq" };
-	std::string process_class_name(const std::string& class_name) {
+	std::string process_class_name(std::string class_name) {
 		if (restricted_names.find(class_name) != restricted_names.end())
 			return class_name + "_t";
+		std::string::size_type n = 0;
+		const std::string s = ".";
+		const std::string t = "::";
+		while ((n = class_name.find(s, n)) != std::string::npos)
+		{
+			class_name.replace(n, s.size(), t);
+			n += t.size();
+		}
 		return class_name;
 	}
 
+	bool is_path(const std::string& class_name) {
+		return class_name.find_first_of(":.") != std::string::npos;
+	}
 	// recursion: < 0 - no recursion, otherwise it is a recursion level incrementing every iteration
 	void foreach_field (
 		const vl::var_desc& v
@@ -216,6 +227,13 @@ namespace vl
 			push_current_container(m_root);
 		}
 		auto parent = get_current_container();
+
+		// Ignore specified branch
+		if (!m_params.ignore.empty())
+			if (m_type_resolver.GetTypeId(parent->get_data()->AsObject()) == m_params.ignore)
+				return false;
+
+		// Process containers
 		if (parent->is_class())
 		{
 			auto parent_obj = parent->as_class();
@@ -229,7 +247,9 @@ namespace vl
 					//		but still should use the original name for data access
 					if (name)
 						if (proto.Has(name))
-							return false;
+							if (name != std::string("proto"))
+								if (proto.Get(name).GetType() == parent_obj->get_data()->AsObject().Get(name).GetType())
+									return false;
 				}
 			if ((val->is_class() && !is_root) || !val->is_class())
 			{
@@ -921,10 +941,12 @@ namespace vl
 		
 		// Get proto id
 		if (auto proto = data_obj.GetPrototype())
-			pdata.proto_id = ctx.writer.get_type_resolver().GetTypeId(proto);
+			pdata.proto_id = process_class_name(ctx.writer.get_type_resolver().GetTypeId(proto));
 		
 		if (!pdata.proto_id.empty())
-			pdata.includes.emplace(pdata.proto_id);
+			if (!is_path(pdata.proto_id))
+				pdata.includes.emplace(pdata.proto_id);
+
 		foreach_field(*this, [&](const std::string& __n, const var_desc_ptr& __f, int) {
 			collect_data_recursion(ctx, pdata, __f, __n, 0);
 		}, -1);
@@ -968,9 +990,10 @@ namespace vl
 			{
 				if (c->has_proto())
 				{
-					auto include = c->get_proto_id(ctx.writer.get_type_resolver());
-					if (pdata.includes.find(include) == pdata.includes.end())
-						pdata.includes.emplace(include);
+					auto include = c->get_proto_class_name(ctx.writer.get_type_resolver());
+					if (!is_path(include))
+						if (pdata.includes.find(include) == pdata.includes.end())
+							pdata.includes.emplace(include);
 				}
 				// Go down recursively for every nested class
 				foreach_field(*f, [&](const std::string& __n, const var_desc_ptr& __f, int) {
@@ -989,14 +1012,14 @@ namespace vl
 		return m_data->AsObject().GetPrototype();
 	}
 
-	std::string class_desc::get_proto_id(const TypeResolver& type_resolver) const
+	std::string class_desc::get_proto_class_name(const TypeResolver& type_resolver) const
 	{
 		if (!m_data)
 			return "";
 		if (!m_data->IsObject())
 			return "";
 		if (auto proto = m_data->AsObject().GetPrototype())
-			return type_resolver.GetTypeId(proto);
+			return process_class_name(type_resolver.GetTypeId(proto));
 		return "";
 	}
 	// End of class_desc

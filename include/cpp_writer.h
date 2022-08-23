@@ -159,7 +159,7 @@ namespace vl
 			return fields_map_view(m_fields);
 		}
 		bool has_proto() const;
-		std::string get_proto_id(const TypeResolver& type_resolver) const;
+		std::string get_proto_class_name(const TypeResolver& type_resolver) const;
 
 	private:
 		std::string m_class_name;
