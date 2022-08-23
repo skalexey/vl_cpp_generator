@@ -14,6 +14,7 @@ deps_scenario()
 	download_dependency "DataModelBuilder" "$depsLocation" "git@github.com:skalexey/DataModelBuilder.git"
 	local currentDir=${PWD}
 	log "deps_scenario of folder '${PWD##*/}' finished" " -"
+	source "$depsLocation/DataModelBuilder/Core/deps_scenario.sh"
 	cd $currentDir
 }
 
