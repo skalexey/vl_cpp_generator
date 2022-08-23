@@ -881,15 +881,15 @@ namespace vl
 								PRINT_SETTER_DEFINITION(fn, "bool");
 						} else if (p->is_number()) {
 							// Define number getter
-							PRINT_LINE(METHOD_DEFINITION("double", fn, "", " const"));
+							PRINT_LINE(METHOD_DEFINITION("float", fn, "", " const"));
 							PRINT_SCOPE_BEGIN;
-							PRINT_LINE(VARIABLE_DECLARATION("double", "empty_val", "0.0f"));
+							PRINT_LINE(VARIABLE_DECLARATION("float", "empty_val", "0.0f"));
 							PRINT_DATA_TYPE_RETURN_WITH_CHECKS("Number", fn, ".Val()");
 							PRINT_SCOPE_END;
 							PRINT_LINE_BREAK;
 							// Define number setter
 							if (ctx.writer.get_params().cppgen_params.generate_setters)
-								PRINT_SETTER_DEFINITION(fn, "double");
+								PRINT_SETTER_DEFINITION(fn, "float");
 						} else if (p->is_string()) {
 							// Define string getter
 							PRINT_LINE(METHOD_DEFINITION("const std::string&", fn, "", " const"));
