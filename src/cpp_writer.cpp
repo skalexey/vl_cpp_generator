@@ -141,7 +141,7 @@ namespace
 	#define METHOD_DEFINITION(type, n, args, suffix) METHOD_SIGNATURE(type, n, args, CLASS_CPP_SCOPE, suffix)
 
 	#define CLASS_GETTER_SIGNATURE(prefix, fn, c, scope, suffix) \
-		METHOD_SIGNATURE(prefix << c->as_class()->get_name() << "& ", "get_" << fn, "", scope, suffix)
+		METHOD_SIGNATURE(prefix << c->as_class()->get_name() << "& ", "" << fn, "", scope, suffix)
 	#define CLASS_GETTER_DECLARATION(prefix, fn, c, suffix) CLASS_GETTER_SIGNATURE(prefix, fn, c, "", suffix) << ";"
 	#define CLASS_GETTER_DEFINITION(prefix, fn, c, suffix) CLASS_GETTER_SIGNATURE(prefix, fn, c, CLASS_CPP_SCOPE, suffix)
 
@@ -634,8 +634,8 @@ namespace vl
 				PRINT_LINE("// \"" << n << "\" field");
 				if (auto c = f->as_class())
 				{
-					PRINT_LINE(CLASS_GETTER_DECLARATION("", n, c, ""));
-					PRINT_LINE(CLASS_GETTER_DECLARATION("const ", n, c, " const"));
+					PRINT_LINE(CLASS_GETTER_DECLARATION("", "get_" << n, c, ""));
+					PRINT_LINE(CLASS_GETTER_DECLARATION("const ", "get_" << n, c, " const"));
 				}
 				else if (auto l = f->as_list())
 				{
@@ -645,13 +645,13 @@ namespace vl
 				else if (auto p = f->as_primitive_type())
 				{
 					if (p->is_bool()) {
-						PRINT_LINE(MEHTOD_DECLARATION("bool", n, "", ""));
+						PRINT_LINE(MEHTOD_DECLARATION("bool", n, "", " const"));
 						if (ctx.writer.get_params().cppgen_params.generate_setters)
 							PRINT_LINE(MEHTOD_DECLARATION("void", "set_" << n, "bool value", ""));
 					} else if (p->is_number()) {
-						PRINT_LINE(MEHTOD_DECLARATION("double", n, "", ""));
+						PRINT_LINE(MEHTOD_DECLARATION("float", n, "", " const"));
 						if (ctx.writer.get_params().cppgen_params.generate_setters)
-							PRINT_LINE(MEHTOD_DECLARATION("void", "set_" << n, "double value", ""));
+							PRINT_LINE(MEHTOD_DECLARATION("void", "set_" << n, "float value", ""));
 					} else if (p->is_string()) {
 						PRINT_LINE(MEHTOD_DECLARATION("const std::string&", n, "", " const"));
 						if (ctx.writer.get_params().cppgen_params.generate_setters)
@@ -836,14 +836,14 @@ namespace vl
 				if (auto c = v->as_class())
 				{
 					// Define non-const class getter
-					PRINT_LINE((c && !c->as_class()->is_type() ? CLASS_CPP_SCOPE : "") << CLASS_GETTER_DEFINITION("", fn, c, ""));
+					PRINT_LINE((c && !c->as_class()->is_type() ? CLASS_CPP_SCOPE : "") << CLASS_GETTER_DEFINITION("", "get_" << fn, c, ""));
 					PRINT_SCOPE_BEGIN;
 					PRINT_LINE("return m_" << fn << ";");
 					PRINT_SCOPE_END;
 					PRINT_LINE_BREAK;
 					
 					// Define const class getter
-					PRINT_LINE(CLASS_GETTER_DEFINITION("const " << (c && !c->as_class()->is_type() ? CLASS_CPP_SCOPE : ""), fn, c, " const"));
+					PRINT_LINE(CLASS_GETTER_DEFINITION("const " << (c && !c->as_class()->is_type() ? CLASS_CPP_SCOPE : ""), "get_" << fn, c, " const"));
 					PRINT_SCOPE_BEGIN;
 					PRINT_LINE("return m_" << fn << ";");
 					PRINT_SCOPE_END;
