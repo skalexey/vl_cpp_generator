@@ -2,13 +2,14 @@
 
 deps_scenario()
 {
-	local folderName=${PWD##*/}
+	local THIS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+	local folderName=${THIS_DIR##*/}
 
-	source log.sh
+	source $THIS_DIR/log.sh
 	local log_prefix="-- [${folderName} deps_scenario script]: "
 
-	source dependencies.sh
-	source deps_config.sh
+	source $THIS_DIR/dependencies.sh
+	source $THIS_DIR/deps_config.sh
 
 	log "deps_scenario of folder '${PWD##*/}' started" " -"
 	download_dependency "DataModelBuilder" "$depsLocation" "git@github.com:skalexey/DataModelBuilder.git"
