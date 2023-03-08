@@ -14,10 +14,10 @@ get_dependencies()
 
 	local log_prefix="-- [$folderName get_dependencies script]: "
 
-	log "Check for dependencies" " -"
+	log_info "Check for dependencies" " -"
 
 	if [ ! -f "deps_config.sh" ]; then
-		log "No dependencies" " -"
+		log_success "No dependencies" " -"
 		cd "${enterDirectory}"
 		return 0
 	fi
