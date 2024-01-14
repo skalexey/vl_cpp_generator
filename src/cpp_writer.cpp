@@ -7,7 +7,7 @@
 #include "cpp_writer.h"
 #ifdef LOG_ON
 	LOG_TITLE("cpp_writer")
-	SET_LOG_DEBUG(true)
+	SET_LOCAL_LOG_DEBUG(true)
 #endif
 
 namespace
