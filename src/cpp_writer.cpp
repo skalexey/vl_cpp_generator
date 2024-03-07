@@ -135,10 +135,10 @@ namespace
 	#define CLASS_CONSTRUCTOR_SIGNATURE get_name() << "(const vl::VarPtr& data)"
 	#define CLASS_CONSTRUCTOR_2_SIGNATURE get_name() << "(const vl::Var& data)"
 
-	#define METHOD_SIGNATURE(t, n, args, scope, suffix) \
-		t << " " << scope << n << "(" << args << ")" << suffix
-	#define MEHTOD_DECLARATION(type, n, args, suffix) METHOD_SIGNATURE(type, n, args, "", suffix) << ";"
-	#define METHOD_DEFINITION(type, n, args, suffix) METHOD_SIGNATURE(type, n, args, CLASS_CPP_SCOPE, suffix)
+	#define METHOD_SIGNATURE(type, name, args, scope, suffix) \
+		type << " " << scope << name << "(" << args << ")" << suffix
+	#define MEHTOD_DECLARATION(type, name, args, suffix) METHOD_SIGNATURE(type, name, args, "", suffix) << ";"
+	#define METHOD_DEFINITION(type, name, args, suffix) METHOD_SIGNATURE(type, name, args, CLASS_CPP_SCOPE, suffix)
 
 	#define CLASS_GETTER_SIGNATURE(prefix, fn, c, scope, suffix) \
 		METHOD_SIGNATURE(prefix << c->as_class()->get_name() << "& ", "" << fn, "", scope, suffix)
@@ -348,6 +348,12 @@ namespace vl
 	}
 
 	bool cpp_writer::VisitString(const StringVar& var, const char* name)
+	{
+		auto val = std::make_shared<primitive_type_desc>(vl::MakePtr(var));
+		return add_member(val, name);
+	}
+
+	bool cpp_writer::VisitPointer(const PointerVar& var, const char* name)
 	{
 		auto val = std::make_shared<primitive_type_desc>(vl::MakePtr(var));
 		return add_member(val, name);
@@ -656,6 +662,10 @@ namespace vl
 						PRINT_LINE(MEHTOD_DECLARATION("const std::string&", n, "", " const"));
 						if (ctx.writer.get_params().cppgen_params.generate_setters)
 							PRINT_LINE(MEHTOD_DECLARATION("void", "set_" << n, "const std::string& value", ""));
+					} else if (p->is_pointer()) {
+						PRINT_LINE(MEHTOD_DECLARATION("void*", n, "", " const"));
+						if (ctx.writer.get_params().cppgen_params.generate_setters)
+							PRINT_LINE(MEHTOD_DECLARATION("void", "set_" << n, "const void* value", ""));
 					}
 				}
 				PRINT_LINE_BREAK;
@@ -901,6 +911,17 @@ namespace vl
 							// Define string setter
 							if (ctx.writer.get_params().cppgen_params.generate_setters)
 								PRINT_SETTER_DEFINITION(fn, "const std::string&");
+						} else if (p->is_pointer()) {
+							// Define pointer getter
+							PRINT_LINE(METHOD_DEFINITION("void*", fn, "", " const"));
+							PRINT_SCOPE_BEGIN;
+							PRINT_LINE(VARIABLE_DECLARATION("void*", "empty_val", "nullptr"));
+							PRINT_DATA_TYPE_RETURN_WITH_CHECKS("Pointer", fn, ".Val()");
+							PRINT_SCOPE_END;
+							PRINT_LINE_BREAK;
+							// Define pointer setter
+							if (ctx.writer.get_params().cppgen_params.generate_setters)
+								PRINT_SETTER_DEFINITION(fn, "const void*");
 						}
 					}
 				}

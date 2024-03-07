@@ -71,6 +71,7 @@ namespace vl
 		bool is_bool() const { return get_data() && get_data()->IsBool(); };
 		bool is_number() const { return get_data() && get_data()->IsNumber(); };
 		bool is_string() const { return get_data() && get_data()->IsString(); };
+		bool is_pointer() const { return get_data() && get_data()->IsPointer(); };
 	};
 	using primitive_type_ptr = std::shared_ptr<primitive_type_desc>;
 
@@ -227,6 +228,7 @@ namespace vl
 		bool VisitBool(const BoolVar& var, const char* name) override;
 		bool VisitNumber(const NumberVar& var, const char* name) override;
 		bool VisitString(const StringVar& var, const char* name) override;
+		bool VisitPointer(const PointerVar& var, const char* name) override;
 		bool VisitObject(const ObjectVar& var, const char* name) override;
 		bool EndVisitObject(const ObjectVar& var, const char* name) override;
 		bool VisitList(const ListVar& var, const char* name) override;
