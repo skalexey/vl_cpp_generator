@@ -1,6 +1,6 @@
 #include <iostream>
 #include <DMBCore.h>
-#include <utils/Log.h>
+#include <utils/log.h>
 #include "cpp_writer.h"
 #include "cpp_generator.h"
 

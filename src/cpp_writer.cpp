@@ -3,7 +3,7 @@
 #include <cassert>
 #include <vl.h>
 #include <TypeResolver.h>
-#include <utils/Log.h>
+#include <utils/log.h>
 #include "cpp_writer.h"
 #ifdef LOG_ON
 	LOG_TITLE("cpp_writer")
