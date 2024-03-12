@@ -4,10 +4,7 @@
 #include "cpp_writer.h"
 #include "cpp_generator.h"
 
-#ifdef LOG_ON
-	LOG_TITLE("spell_options")
-	SET_LOCAL_LOG_DEBUG(true)
-#endif
+LOG_TITLE("cpp_generator")
 
 namespace vl
 {
@@ -40,7 +37,7 @@ namespace vl
 				}
 				else
 				{
-					std::cout << "	Can't find json branch by the given path '" << json_branch << "'\n";
+					LOG_ERROR("	Can't find json branch by the given path '" << json_branch << "'");
 					return 2;
 				}
 			}
@@ -52,7 +49,7 @@ namespace vl
 		}
 		else
 		{
-			std::cout << "	Can't load JSON '" << input_file_path << "'\n";
+			LOG_ERROR("	Can't load JSON '" << input_file_path << "'");
 			return 1;
 		}
 		

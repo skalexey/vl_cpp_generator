@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iterator>
 #include <fstream>
 #include <unordered_map>
@@ -85,7 +87,6 @@ namespace vl
 		using fields_list = std::vector<var_desc_ptr>;
 		using fields_map_view = utils::ordered_map_view<std::string, var_desc_ptr>;
 		using fields_map = utils::ordered_map<std::string, var_desc_ptr>;
-		using field_name_list = std::vector<std::string>;
 		
 	protected:
 		struct print_data

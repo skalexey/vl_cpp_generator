@@ -5,10 +5,9 @@
 #include <TypeResolver.h>
 #include <utils/log.h>
 #include "cpp_writer.h"
-#ifdef LOG_ON
-	LOG_TITLE("cpp_writer")
-	SET_LOCAL_LOG_DEBUG(true)
-#endif
+
+LOG_TITLE("cpp_writer")
+SET_LOCAL_LOG_DEBUG(true)
 
 namespace
 {
