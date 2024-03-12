@@ -26,7 +26,7 @@ namespace vl
 			{
 				if (auto node = m.GetVarNodeRegistry().GetNode(json_branch))
 				{
-					auto& data = node->GetData()->AsObject();
+					auto& data = node->GetData()->as<vl::Object>();
 					auto last_dot_pos = json_branch.find_last_of(".");
 					if (last_dot_pos != std::string::npos)
 						params.root_name = json_branch.substr(last_dot_pos + 1);

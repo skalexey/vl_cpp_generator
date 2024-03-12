@@ -9,7 +9,7 @@ void WriteTest()
 	pear.Set("color", "Yellow");
 	pear.Set("radius", 0.3f);
 	pear.Set("branchCount", 1);
-	std::cout << "Val: " << pear.Get("color").AsString().Val() << "\n";
+	std::cout << "Val: " << pear.Get("color").as<vl::String>().Val() << "\n";
 	auto bush = vl::Object();
 	bush.Set("leafColor", "Green");
 	bush.Set("isTree", true);
@@ -26,8 +26,8 @@ void WriteTest()
 	auto branch2 = branch.Copy();
 	branch2.Set("leafCount", 3);
 	branch2.Set("fruit", pear);
-	branch1.Get("branches").AsList().Add(branch2);
-	bush.Get("branches").AsList().Add(branch1);
+	branch1.Get("branches").as<vl::List>().Add(branch2);
+	bush.Get("branches").as<vl::List>().Add(branch1);
 	vl::JSONConverter converter;
 	const char* fName = "write_test.json";
 	if (converter.Store(bush, TypeResolver(), fName, {true}))

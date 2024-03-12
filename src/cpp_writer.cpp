@@ -66,14 +66,14 @@ namespace
 		PRINT_INDENT_DECREASE;
 
 	#define PRINT_DATA_IS_OBJECT_CHECK(return_ex) \
-		PRINT_LINE("if (!" << M_DATA << "->IsObject())"); \
+		PRINT_LINE("if (!" << M_DATA << "->is<vl::Object>())"); \
 		PRINT_INDENT_INCREASE; \
 		PRINT_LINE("return" << return_ex << ";"); \
 		PRINT_INDENT_DECREASE;
 
 	// Variables declarations
 	#define PRINT_DATA_OBJ \
-		PRINT_LINE("auto& data_obj = " << M_DATA << "->AsObject();");
+		PRINT_LINE("auto& data_obj = " << M_DATA << "->as<vl::Object>();");
 
 	#define VARIABLE_DECLARATION(t, n, v) \
 		t << " " << n << " = " << v << ";";
@@ -229,7 +229,7 @@ namespace vl
 
 		// Ignore specified branch
 		if (!m_params.ignore.empty())
-			if (m_type_resolver.GetTypeId(parent->get_data()->AsObject()) == m_params.ignore)
+			if (m_type_resolver.GetTypeId(parent->get_data()->as<vl::Object>()) == m_params.ignore)
 				return false;
 
 		// Process containers
@@ -238,16 +238,16 @@ namespace vl
 			auto parent_obj = parent->as_class();
 			
 			if (m_params.cppgen_params.ignore_overloadings)
-				if (auto proto = parent_obj->get_data()->AsObject().GetPrototype())
+				if (auto proto = parent_obj->get_data()->as<vl::Object>().GetPrototype())
 				{
 					// Ignore overloadings
 					// TODO: support overloadings cpp generation
-					// 		Now the problem is that we should convern field names according to C++ syntax
+					// 		Now the problem is that we should convert field names according to C++ syntax
 					//		but still should use the original name for data access
 					if (name)
 						if (proto.Has(name))
 							if (name != std::string("proto"))
-								if (proto.Get(name).GetType() == parent_obj->get_data()->AsObject().Get(name).GetType())
+								if (proto.Get(name).GetType() == parent_obj->get_data()->as<vl::Object>().Get(name).GetType())
 									return false;
 				}
 			if ((val->is_class() && !is_root) || !val->is_class())
@@ -798,7 +798,7 @@ namespace vl
 			PRINT_LINE("return false;");
 			PRINT_INDENT_DECREASE;
 			// Data consistency check
-			PRINT_LINE("if (!m_data->IsObject())");
+			PRINT_LINE("if (!m_data->is<vl::Object>())");
 			PRINT_INDENT_INCREASE;
 			PRINT_LINE("return false;");
 			PRINT_INDENT_DECREASE;
@@ -951,13 +951,13 @@ namespace vl
 			return -3;
 		}
 
-		if (!data->IsObject())
+		if (!data->is<vl::Object>())
 		{
 			LOCAL_ERROR("Attemption to print a wrongly itialized class '" << m_class_name << "'. Data should be of 'Object' type");
 			return -4;
 		}
 		
-		auto& data_obj = data->AsObject();
+		auto& data_obj = data->as<vl::Object>();
 		
 		// Get proto id
 		if (auto proto = data_obj.GetPrototype())
@@ -1027,18 +1027,18 @@ namespace vl
 	{
 		if (!m_data)
 			return false;
-		if (!m_data->IsObject())
+		if (!m_data->is<vl::Object>())
 			return false;
-		return m_data->AsObject().GetPrototype();
+		return m_data->as<vl::Object>().GetPrototype();
 	}
 
 	std::string class_desc::get_proto_class_name(const TypeResolver& type_resolver) const
 	{
 		if (!m_data)
 			return "";
-		if (!m_data->IsObject())
+		if (!m_data->is<vl::Object>())
 			return "";
-		if (auto proto = m_data->AsObject().GetPrototype())
+		if (auto proto = m_data->as<vl::Object>().GetPrototype())
 			return process_class_name(type_resolver.GetTypeId(proto));
 		return "";
 	}

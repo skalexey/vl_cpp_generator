@@ -70,10 +70,10 @@ namespace vl
 		bool is_primitive() const override { return true; }
 		primitive_type_desc* as_primitive_type() override { return this; }
 		const primitive_type_desc* as_primitive_type() const override { return this; }
-		bool is_bool() const { return get_data() && get_data()->IsBool(); };
-		bool is_number() const { return get_data() && get_data()->IsNumber(); };
-		bool is_string() const { return get_data() && get_data()->IsString(); };
-		bool is_pointer() const { return get_data() && get_data()->IsPointer(); };
+		bool is_bool() const { return get_data() && get_data()->is<vl::Bool>(); };
+		bool is_number() const { return get_data() && get_data()->is<vl::Number>(); };
+		bool is_string() const { return get_data() && get_data()->is<vl::String>(); };
+		bool is_pointer() const { return get_data() && get_data()->is<vl::Pointer>(); };
 	};
 	using primitive_type_ptr = std::shared_ptr<primitive_type_desc>;
 
