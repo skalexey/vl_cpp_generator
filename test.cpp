@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vl/TypeResolver.h>
 #include "JSONConverter.h"
 
 void WriteTest()
@@ -21,19 +22,19 @@ void WriteTest()
 	branch.Set("leafCount", 10);
 	branch.Set("fruit", vl::Object());
 	branch.Set("branches", vl::List());
-	auto branch1 = branch.Copy();
+	auto branch1 = branch.Copy().as<vl::Object>();
 	branch1.Set("leafCount", 9);
-	auto branch2 = branch.Copy();
+	auto branch2 = branch.Copy().as<vl::Object>();
 	branch2.Set("leafCount", 3);
 	branch2.Set("fruit", pear);
 	branch1.Get("branches").as<vl::List>().Add(branch2);
 	bush.Get("branches").as<vl::List>().Add(branch1);
 	vl::JSONConverter converter;
 	const char* fName = "write_test.json";
-	if (converter.Store(bush, TypeResolver(), fName, {true}))
+	if (converter.Store(bush, vl::TypeResolver(), fName, {true}))
 	{
 		std::cout << "Stored to '" << fName << "':\n";
-		std::cout << converter.JSONStr(bush, TypeResolver(), { true });
+		std::cout << converter.JSONStr(bush, vl::TypeResolver(), { true });
 	}
 	else
 		std::cout << "Store error\n";
@@ -47,7 +48,7 @@ void LoadTest()
 	const char* fName = "write_test.json";
 	if (converter.Load(object, fName))
 		std::cout << "Loaded from '" << fName << "':\n";
-	std::cout << converter.JSONStr(object, TypeResolver(), { true });
+	std::cout << converter.JSONStr(object, vl::TypeResolver(), { true });
 }
 
 int main(int argc, const char* argv[])

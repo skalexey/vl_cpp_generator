@@ -2,12 +2,12 @@
 #include <cstring>
 #include <cassert>
 #include <vl.h>
-#include <TypeResolver.h>
+#include <vl/TypeResolver.h>
 #include <utils/log.h>
 #include "cpp_writer.h"
 
 LOG_TITLE("cpp_writer")
-SET_LOCAL_LOG_DEBUG(true)
+SET_LOCAL_LOG_LEVEL(debug)
 
 namespace
 {
@@ -490,12 +490,11 @@ namespace vl
 	{
 		auto& res = m_fields.add(name, field);
 		field->set_parent(shared());
-		return res;
+		return (*res.first).second;
 	}
 	
 	const var_desc_ptr* class_desc::find_field(const std::string& field_name) const
 	{
-		static var_desc_ptr null_var_desc(nullptr);
 		auto it = m_fields.find(field_name);
 		if (it == m_fields.end())
 			return nullptr;

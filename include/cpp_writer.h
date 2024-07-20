@@ -85,8 +85,8 @@ namespace vl
 
 	public:
 		using fields_list = std::vector<var_desc_ptr>;
-		using fields_map_view = utils::ordered_map_view<std::string, var_desc_ptr>;
-		using fields_map = utils::ordered_map<std::string, var_desc_ptr>;
+		using fields_map_view = utils::ordered_hashmap_view<std::string, var_desc_ptr>;
+		using fields_map = utils::ordered_hashmap<std::string, var_desc_ptr>;
 		
 	protected:
 		struct print_data
@@ -163,7 +163,7 @@ namespace vl
 
 	private:
 		std::string m_class_name;
-		utils::ordered_map<std::string, var_desc_ptr> m_fields;
+		utils::ordered_hashmap<std::string, var_desc_ptr> m_fields;
 		bool m_is_type = false;
 		
 	protected:
