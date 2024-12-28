@@ -25,13 +25,13 @@ macro(setup_module)
 
 	if (CLIENT)
 		# add client executable
-		add_executable(vl_jsontocpp vl_jsontocpp.cpp)
-		target_link_libraries(vl_jsontocpp cpp_generator)
+		add_executable(vlcppgen vl_jsontocpp.cpp)
+		target_link_libraries(vlcppgen cpp_generator)
 	endif ()
 	
 	# update dependencies.
 	# add_custom_command(
-	# 	TARGET vl_jsontocpp PRE_BUILD
+	# 	TARGET vlcppgen PRE_BUILD
 	# 	COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/get_dependencies.sh "${CMAKE_CURRENT_SOURCE_DIR}" ${CMAKE_BUILD_TYPE}
 	# 	VERBATIM
 endmacro()
