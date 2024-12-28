@@ -93,21 +93,27 @@ namespace
 		PRINT_LINE("auto& " << DATA_VAR_NAME(fn) << " = data_obj.Get(\"" << fn << "\");");
 	
 
+	#define DATA_METHOD_CALL(fn, m, suffix) \
+		"data_obj." << m << "(" << fn << ")" << suffix
+
 	#define PRINT_RETURN_DATA_METHOD_UNQUOTED(fn, m, suffix) \
-		PRINT_LINE("return data_obj." << m << "(" << fn << ")" << suffix << ";");
+		PRINT_LINE("return " << DATA_METHOD_CALL(fn, m, suffix) << ";");
+
+	#define PRINT_RETURN_DATA_METHOD_DEREFERENCED_UNQUOTED(fn, m, suffix) \
+		PRINT_LINE("return *" << DATA_METHOD_CALL(fn, m, suffix) << ";");
 
 	// Typed data
 	#define PRINT_DATA_IS_TYPE_CHECK(t, fn, return_ex); \
-		PRINT_LINE("if (!" << DATA_VAR_NAME(fn) << ".Is" << t << "())"); \
+		PRINT_LINE("if (!" << DATA_VAR_NAME(fn) << ".is<vl::" << t << ">())"); \
 		PRINT_INDENT_INCREASE; \
 		PRINT_LINE("return" << return_ex << ";"); \
 		PRINT_INDENT_DECREASE;
 
 	#define PRINT_DATA_TYPE(t, fn); \
-		PRINT_LINE("auto& " << DATA_VAR_NAME(fn) << "_" << t " = " << DATA_VAR_NAME(fn) << ".As" << t << "()"; );
+		PRINT_LINE("auto& " << DATA_VAR_NAME(fn) << "_" << t " = " << DATA_VAR_NAME(fn) << ".as<vl::" << t << ">()"; );
 
 	#define PRINT_DATA_RETURN_AS_TYPE(t, fn, suffix); \
-		PRINT_LINE("return " << DATA_VAR_NAME(fn) << ".As" << t << "()" << suffix << ";");
+		PRINT_LINE("return " << DATA_VAR_NAME(fn) << ".as<vl::" << t << ">()" << suffix << ";");
 
 	#define PRINT_DATA_TYPE_WITH_CHECKS(t, fn) \
 		PRINT_DATA_OBJECT_WITH_CHECKS(" empty_val"); \
@@ -124,6 +130,10 @@ namespace
 	#define PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED(fn, m, return_ex) \
 		PRINT_DATA_OBJECT_WITH_CHECKS(return_ex); \
 		PRINT_RETURN_DATA_METHOD_UNQUOTED(fn, m, "");
+	
+	#define PRINT_DATA_RETURN_WITH_CHECKS_DEREFERENCED_UNQUOTED(fn, m, return_ex) \
+		PRINT_DATA_OBJECT_WITH_CHECKS(return_ex); \
+		PRINT_RETURN_DATA_METHOD_DEREFERENCED_UNQUOTED(fn, m, "");
 }
 
 namespace
@@ -561,6 +571,7 @@ namespace vl
 			PRINT_LINE_BREAK;
 			// Include VL
 			PRINT_LINE("#include <vl_fwd.h>");
+			PRINT_LINE("#include <vl/var_ptr.h>");
 
 			if (!includes.empty())
 			{
@@ -607,9 +618,14 @@ namespace vl
 			PRINT_LINE("bool has_data(const std::string& field_name) const;");
 			// Declare has_data_own(string) method
 			PRINT_LINE("bool has_data_own(const std::string& field_name) const;");
-			// Declare get_data() method
+			// Declare get_data() const method
 			PRINT_LINE("// Data getter for internal use");
 			PRINT_LINE("const vl::VarPtr& get_data() const {");
+			PRINT_INDENT_INCREASE;
+			PRINT_LINE("return m_data;");
+			PRINT_SCOPE_END;
+			// Declare data() method
+			PRINT_LINE("vl::VarPtr data() {");
 			PRINT_INDENT_INCREASE;
 			PRINT_LINE("return m_data;");
 			PRINT_SCOPE_END;
@@ -764,7 +780,7 @@ namespace vl
 					// TODO: add checks for the field existance
 					// TODO: add logs when the data is not found or has a wrong type
 					PRINT_LINE("m_" << fn << " = "
-							   << "{vl::MakePtr(data_obj.Get(\"" << cn << "\"))};");
+							   << "{data_obj.GetDef(\"" << cn << "\")};");
 				});
 			}
 			PRINT_SCOPE_END;
@@ -811,7 +827,7 @@ namespace vl
 		{
 			PRINT_LINE("const vl::Var& " << CLASS_CPP_SCOPE << "get_data(const std::string& field_name) const");
 			PRINT_SCOPE_BEGIN;
-			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", "Get", " vl::emptyVar");
+			PRINT_DATA_RETURN_WITH_CHECKS_DEREFERENCED_UNQUOTED("field_name", "Get", " vl::EmptyVar()");
 			PRINT_SCOPE_END;
 			PRINT_LINE_BREAK;
 		}
@@ -821,7 +837,7 @@ namespace vl
 		{
 			PRINT_LINE("bool " << CLASS_CPP_SCOPE << "has_data(const std::string& field_name) const");
 			PRINT_SCOPE_BEGIN;
-			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", "Has", " vl::emptyVar");
+			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", "Has", " vl::EmptyVar()");
 			PRINT_SCOPE_END;
 			PRINT_LINE_BREAK;
 		}
@@ -831,7 +847,7 @@ namespace vl
 		{
 			PRINT_LINE("bool " << CLASS_CPP_SCOPE << "has_data_own(const std::string& field_name) const");
 			PRINT_SCOPE_BEGIN;
-			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", "HasOwn", " vl::emptyVar");
+			PRINT_DATA_RETURN_WITH_CHECKS_UNQUOTED("field_name", "HasOwn", " vl::EmptyVar()");
 			PRINT_SCOPE_END;
 			PRINT_LINE_BREAK;
 		}
@@ -870,7 +886,7 @@ namespace vl
 						// Define const list getter
 						PRINT_LINE(METHOD_DEFINITION("const vl::List&", "get_" + fn, "", " const"));
 						PRINT_SCOPE_BEGIN;
-						PRINT_LINE(STATIC_VARIABLE_DECLARATION("vl::List", "empty_val", "vl::emptyList"));
+						PRINT_LINE(STATIC_VARIABLE_DECLARATION("vl::List", "empty_val", "vl::EmptyList()"));
 						PRINT_DATA_TYPE_RETURN_WITH_CHECKS("List", fn, "");
 						PRINT_SCOPE_END;
 					}
