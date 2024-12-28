@@ -12,6 +12,7 @@ function update_scripts()
 	cp "$scripts_dir/include/os.sh" .
 	cp "$scripts_dir/include/input.sh" .
 	cp "$scripts_dir/include/file_utils.sh" .
+	cp "$scripts_dir/include/file_utils.py" .
 
 	source log.sh
 	local log_prefix="[update_scripts]: "
